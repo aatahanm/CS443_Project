@@ -19,14 +19,14 @@ public class ShortURLGeneratorController {
 	private ShortURLGeneratorService shortService;
 	
 	@RequestMapping("/create")
-	public String create(@RequestParam String longURL, @RequestParam int number)
+	public String create(@RequestParam String userName, @RequestParam String longURL, @RequestParam int number)
 	{
-		ShortURLGenerator s = shortService.create(longURL, number);
+		ShortURLGenerator s = shortService.create(userName, longURL, number);
 		return s.toString();
 	}
 	
 	@RequestMapping("/createSpecialShortURL")
-	public String create(@RequestParam String longURL, @RequestParam String shortURL)
+	public String createSpecial(@RequestParam String longURL, @RequestParam String shortURL)
 	{
 		ShortURLGenerator s = shortService.createCustomized();
 		s.setLongURL(longURL);
@@ -50,9 +50,9 @@ public class ShortURLGeneratorController {
 	
 	
 	@RequestMapping("/getAll")
-	public List<ShortURLGenerator> getAllShorts()
+	public List<ShortURLGenerator> getAllShorts(@RequestParam String userName)
 	{
-		return shortService.getAllShort();
+		return shortService.getAllShortURLs(userName);
 	}
 	
 	
@@ -76,12 +76,19 @@ public class ShortURLGeneratorController {
 		shortService.updateDuration(shortURL, duration);
 		return "Duration is updated";
 	}
-	
+
 	@RequestMapping("/deleteAll")
 	public String deleteAll()
 	{
 		shortService.deleteAll();
-		return "Deleted";
+		return "All database has been deleted!";
+	}
+	
+	@RequestMapping("/deleteUserURL")
+	public String deleteUserURL(@RequestParam String userName)
+	{
+		shortService.deleteUserURLs(userName);
+		return userName +  "All short URLs are deleted!";
 	}
 	
 	@RequestMapping("/delete")

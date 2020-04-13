@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.model.ShortURLGenerator;
 import com.example.demo.repository.ShortURLGeneratorRepository;
+
+import java.sql.Struct;
 import java.util.*;
 @Service
 public class ShortURLGeneratorService {
@@ -14,9 +16,9 @@ public class ShortURLGeneratorService {
 	
 	// create a short url
 	
-	public ShortURLGenerator create(String longURL, int number)
+	public ShortURLGenerator create(String userName, String longURL, int number)
 	{
-		return shortRepo.save(new ShortURLGenerator(longURL, number));
+		return shortRepo.save(new ShortURLGenerator(userName, longURL, number));
 	}
 	
 	// create customized url
@@ -27,9 +29,9 @@ public class ShortURLGeneratorService {
 	
 	// retrieve
 	
-	public List<ShortURLGenerator> getAllShort(){
-		return shortRepo.findAll();
-		
+	public List<ShortURLGenerator> getAllShortURLs(String userName)
+	{
+		return shortRepo.findByUserName(userName);
 	}
 	
 	public String getLongURL(String shortURL)
@@ -69,10 +71,18 @@ public class ShortURLGeneratorService {
 	}
 	
 	// delete
-	
-	public void deleteAll()
-	{
+
+	public void deleteAll(){
 		shortRepo.deleteAll();
+	}
+	
+	public void deleteUserURLs(String userName)
+	{
+		List<ShortURLGenerator> s = getAllShortURLs(userName);
+		for( int i = 0; i < s.size(); i++)
+		{
+			shortRepo.delete(s.get(i));
+		}
 	}
 	
 	public void delete(String shortURL)

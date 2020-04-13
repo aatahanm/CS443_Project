@@ -8,14 +8,15 @@ public class ShortURLGenerator {
 
 	@Id
 	String id;
-	
+	String userName;
 	private String longURL;
 	private String shortURL;
 	private int number;
 	
-	public ShortURLGenerator(String longURL, int number)
+	public ShortURLGenerator(String userName, String longURL, int number)
 	{
 		this.longURL = longURL;
+		this.userName = userName;
 		this.number = number;
 		setShortURL(number);
 	}
@@ -63,8 +64,11 @@ public class ShortURLGenerator {
 	}
 	
 	public String toString() {
-		return  "Short URL: " + shortURL + " Long URL: " + longURL;
+		return  "User Name: " + userName + " Short URL: " + shortURL + " Long URL: " + longURL;
 	}
-	
-	
+
+	public String getUserName() {
+		return userName;
+	}
+
 }
