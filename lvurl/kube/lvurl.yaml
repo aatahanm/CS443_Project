@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lvurl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lvurl
+  template:
+    metadata:
+      labels:
+        app: lvurl
+    spec:
+      containers:
+        - name: lvurl
+          image: springio/lvurl:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGO_URL
+              value: mongodb://mongo:27017/test
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lvurl
+spec:
+  selector:
+    app: lvurl
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer

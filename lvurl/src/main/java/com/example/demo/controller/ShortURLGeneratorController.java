@@ -17,6 +17,12 @@ public class ShortURLGeneratorController {
 
 	@Autowired
 	private ShortURLGeneratorService shortService;
+
+	@RequestMapping("/")
+	public String homePage()
+	{
+		return "Welcome, It works!";
+	}
 	
 	@RequestMapping("/create")
 	public String create(@RequestParam String userName, @RequestParam String longURL, @RequestParam int number)
