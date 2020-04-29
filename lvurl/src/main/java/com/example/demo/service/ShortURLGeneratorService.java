@@ -18,6 +18,9 @@ public class ShortURLGeneratorService {
 	
 	public ShortURLGenerator create(String userName, String longURL, int number)
 	{
+		while(shortRepo.findByNumber(number) != null){
+			number++;
+		}
 		return shortRepo.save(new ShortURLGenerator(userName, longURL, number));
 	}
 	
