@@ -37,7 +37,10 @@ public class ShortURLGeneratorService {
 	public String getLongURL(String shortURL)
 	{
 		ShortURLGenerator s = shortRepo.findByShortURL(shortURL);
-		return s.getLongURL();
+		if (s != null)
+			return s.getLongURL();
+		else
+			return null;
 	}
 	
 	

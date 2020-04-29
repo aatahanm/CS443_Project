@@ -2,30 +2,49 @@ package com.example.demo.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 // import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.*;
+
 import com.example.demo.model.ShortURLGenerator;
 import com.example.demo.service.ShortURLGeneratorService;
+
 
 @RestController
 public class ShortURLGeneratorController {
 
 	@Autowired
 	private ShortURLGeneratorService shortService;
+	
 
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public void redirect(@PathVariable String id, HttpServletResponse resp) throws Exception
+    {
+    	
+    	final String url = shortService.getLongURL(id);
+        if (url != null)
+            resp.sendRedirect(url);
+        else
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+    
 	@RequestMapping("/")
 	public String homePage()
 	{
 		return "Welcome, It works!";
 	}
 	
-	@RequestMapping("/create")
-	public String create(@RequestParam String userName, @RequestParam String longURL, @RequestParam int number)
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public String create(@RequestParam String userName, @RequestParam String longURL, @RequestParam int number, HttpServletResponse resp)
 	{
 		ShortURLGenerator s = shortService.create(userName, longURL, number);
 		return s.toString();
