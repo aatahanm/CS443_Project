@@ -9,15 +9,21 @@ public class User {
 	@Id
 	String id;
 	private String userName;
+	private String password;
 	private String name;
 	private String surName;
 	private String mail;
 	private int number;
 	
-	public User(String userName)
+	public User(String userName, String password)
 	{
 		this.userName = userName;
+		this.password = password;
 		number = 0;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	public String getUserName() {

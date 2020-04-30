@@ -85,7 +85,7 @@ public class ShortURLGenerator {
 			while (hashtext.length() < 32) {
 				hashtext = "0" + hashtext;
 			}
-			return hashtext.substring(0,6);
+			return hashtext;
 		}
 		// For specifying wrong message digest algorithms
 		catch (NoSuchAlgorithmException e) {

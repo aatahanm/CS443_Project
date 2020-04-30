@@ -2,34 +2,48 @@ package com.example.demo.controller;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-// import java.util.List;
+// import java.com.example.demo.util.List;
 
+import com.example.demo.filters.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import org.springframework.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.model.*;
 import com.example.demo.service.ShortURLGeneratorService;
 import com.example.demo.service.UserService;
+import com.example.demo.util.JwtUtil;
 
 
 @RestController
 public class ShortURLGeneratorController {
 
 	@Autowired
+	private AuthenticationManager authenticationManager;
+
+	@Autowired
 	private ShortURLGeneratorService shortService;
 	
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private JwtUtil jwtTokenUtil;
 	
 	
 
@@ -50,14 +64,14 @@ public class ShortURLGeneratorController {
 		return "Welcome, It works!";
 	}
 	
-	@RequestMapping("/createUser")
-	public String userCreation(@RequestParam String userName)
+	@RequestMapping("/create/User")
+	public String userCreation(@RequestParam String userName, @RequestParam String password)
 	{
-		com.example.demo.model.User u = userService.createUser(userName);
+		com.example.demo.model.User u = userService.createUser(userName, password);
 		return u.toString();
 		
 	}
-	@RequestMapping("/create")
+	@RequestMapping("/create/URL")
 	public String createURL(@RequestParam String userName, @RequestParam String longURL, HttpServletResponse resp) throws Exception
 	{
 		ShortURLGenerator s;
@@ -166,5 +180,64 @@ public class ShortURLGeneratorController {
 		resp.setStatus(HttpServletResponse.SC_OK);
 		return shortURL + " is deleted";
 	}
+
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+
+		try {
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
+			);
+		}
+		catch (BadCredentialsException e) {
+			throw new Exception("Incorrect username or password", e);
+		}
+
+
+		final UserDetails userDetails = userService
+				.loadUserByUsername(authenticationRequest.getUsername());
+
+		final String jwt = jwtTokenUtil.generateToken(userDetails);
+
+		return ResponseEntity.ok(new AuthenticationResponse(jwt));
+	}
 	
+}
+
+@EnableWebSecurity
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	@Autowired
+	private UserService myUserDetailsService;
+	@Autowired
+	private JwtRequestFilter jwtRequestFilter;
+
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(myUserDetailsService);
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return NoOpPasswordEncoder.getInstance();
+	}
+
+	@Override
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Override
+	protected void configure(HttpSecurity httpSecurity) throws Exception {
+		httpSecurity.csrf().disable()
+				.authorizeRequests()
+					.antMatchers("/authenticate","/create/User","/").permitAll()
+					.antMatchers("/getAll","/create/URL").denyAll()
+					.anyRequest().authenticated().and().
+				exceptionHandling().and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+	}
+
 }
