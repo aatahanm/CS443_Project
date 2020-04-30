@@ -2,11 +2,13 @@ package com.example.demo.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 // import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,8 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.*;
 
-import com.example.demo.model.ShortURLGenerator;
+import com.example.demo.model.*;
 import com.example.demo.service.ShortURLGeneratorService;
+import com.example.demo.service.UserService;
 
 
 @RestController
@@ -24,6 +27,10 @@ public class ShortURLGeneratorController {
 
 	@Autowired
 	private ShortURLGeneratorService shortService;
+	
+	@Autowired
+	private UserService userService;
+	
 	
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -43,10 +50,26 @@ public class ShortURLGeneratorController {
 		return "Welcome, It works!";
 	}
 	
-	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(@RequestParam String userName, @RequestParam String longURL, @RequestParam int number, HttpServletResponse resp)
+	@RequestMapping("/createUser")
+	public String userCreation(@RequestParam String userName)
 	{
-		ShortURLGenerator s = shortService.create(userName, longURL, number);
+		com.example.demo.model.User u = userService.createUser(userName);
+		return u.toString();
+		
+	}
+	@RequestMapping("/create")
+	public String createURL(@RequestParam String userName, @RequestParam String longURL, HttpServletResponse resp) throws Exception
+	{
+		ShortURLGenerator s;
+		//try
+		//{
+			s = shortService.create(userName, longURL);
+		//}
+		//catch(Exception x)
+		//{
+		//	resp.sendError(HttpServletResponse.SC_CONFLICT);
+		//	return "Insertion failed!";
+	//	}
 		return s.toString();
 	}
 	
@@ -59,67 +82,88 @@ public class ShortURLGeneratorController {
 		return s.toString();	
 	}
 	
-	@RequestMapping("/get")
-	public ShortURLGenerator getGenerator(@RequestParam String shortURL)
+	
+	@RequestMapping(value = "/getAll", method = RequestMethod.GET)
+	public List<ShortURLGenerator> getAllShorts(@RequestParam String userName, HttpServletResponse resp) throws Exception
 	{
-		ShortURLGenerator s = shortService.getGenerator(shortURL);
-		return s;
+		com.example.demo.model.User u = userService.getUser(userName);
+		List<ShortURLGenerator> lst =  shortService.getAllShortURLs(u.getUserName());
+		
+		if( lst != null)
+		{
+			resp.setStatus(resp.SC_OK);
+			return lst;	
+		}
+		else
+		{
+			resp.sendError(resp.SC_NOT_FOUND);
+			return null;
+		}
 	}
 	
 	
-	@RequestMapping("/getLongURL")
-	public String getLongURL(@RequestParam String shortURL)
+	@RequestMapping(value = "/updateShortURL", method = RequestMethod.PATCH)
+	public String updateShortURL(@RequestParam String shortURL, HttpServletResponse resp)
 	{
-		return shortService.getLongURL(shortURL);
-	}
-	
-	
-	@RequestMapping("/getAll")
-	public List<ShortURLGenerator> getAllShorts(@RequestParam String userName)
-	{
-		return shortService.getAllShortURLs(userName);
-	}
-	
-	
-	@RequestMapping("/updateShortURL")
-	public String updateShortURL(@RequestParam String shortURL, @RequestParam int number)
-	{
-		ShortURLGenerator s = shortService.updateShortURL(shortURL, number);
+		ShortURLGenerator s = shortService.updateShortURL(shortURL);
+		if( s!= null)
+			resp.setStatus(HttpServletResponse.SC_OK);
 		return "Short URL " + shortURL + " updated as " +  s.getNumber();
 	}
 	
-	@RequestMapping("/updateLongURL")
-	public String updateLongURL(@RequestParam String shortURL, @RequestParam String longURL)
+	@RequestMapping(value = "/updateLongURL", method = RequestMethod.PATCH)
+	public String updateLongURL(@RequestParam String shortURL, @RequestParam String longURL, HttpServletResponse resp)
 	{
-		shortService.updateLongURL(shortURL, longURL);
+		if ( shortService.updateLongURL(shortURL, longURL) != null)
+			resp.setStatus(HttpServletResponse.SC_OK);
 		return "Long URL is updated";
 	}
 	
-	@RequestMapping("/updateDuration")
-	public String updateDuration(@RequestParam String shortURL, @RequestParam long duration)
+	@RequestMapping(value = "/updateDuration",  method = RequestMethod.PATCH)
+	public String updateDuration(@RequestParam String shortURL, @RequestParam long duration, HttpServletResponse resp)
 	{
-		shortService.updateDuration(shortURL, duration);
+		if( shortService.updateDuration(shortURL, duration) != null)
+			resp.setStatus(HttpServletResponse.SC_OK);
 		return "Duration is updated";
 	}
 
+	/*
 	@RequestMapping("/deleteAll")
 	public String deleteAll()
 	{
 		shortService.deleteAll();
 		return "All database has been deleted!";
 	}
+	*/
 	
-	@RequestMapping("/deleteUserURL")
-	public String deleteUserURL(@RequestParam String userName)
+	@RequestMapping(value = "/deleteUserURL", method = RequestMethod.DELETE)
+	public String deleteUserURL(@RequestParam String userName, HttpServletResponse resp) throws Exception
 	{
-		shortService.deleteUserURLs(userName);
+		try
+		{
+			shortService.deleteUserURLs(userName);
+		}
+		catch(Exception x)
+		{
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+		resp.setStatus(HttpServletResponse.SC_OK);
 		return userName +  "All short URLs are deleted!";
 	}
 	
-	@RequestMapping("/delete")
-	public String delete(@RequestParam String shortURL)
+	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+	public String delete(@RequestParam String shortURL, HttpServletResponse resp) throws Exception
 	{
-		shortService.delete(shortURL);
+		try
+		{
+			shortService.delete(shortURL);
+		}
+		catch(Exception x)
+		{
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+
+		resp.setStatus(HttpServletResponse.SC_OK);
 		return shortURL + " is deleted";
 	}
 	
