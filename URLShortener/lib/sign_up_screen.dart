@@ -1,7 +1,11 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:URLShortener/utilities/constants.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -9,7 +13,11 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  bool _isLoading = false;
   // bool _rememberMe = false;
+
+  TextEditingController usernameController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
 
     Widget _buildEmailTF() {
     return Column(
@@ -60,6 +68,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: usernameController,
             keyboardType: TextInputType.text,
             style: TextStyle(
               color: Colors.white,
@@ -95,6 +104,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: passwordController,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -143,13 +153,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
   //   );
   // }
 
+  signUp(String username, String password) async{
+    Map data = {
+      'username': username,
+      'password': password
+    };
+    var jsonData = null;
+    var response = await http.post("http://192.168.1.107:31703/create/User",
+     body: json.encode(data),
+     headers: { 
+       'Content-type': "application/json"});
+    if(response.statusCode == 200){
+      Navigator.of(context).pushReplacementNamed('/login');
+    }else {
+      print(response.statusCode);
+    }
+  }
+
   Widget _buildSignUpBtn() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () => Navigator.of(context).pushReplacementNamed('/login'),//print('Login Button Pressed'),
+        onPressed: () {
+          setState(() {
+            _isLoading = true;
+          });
+          signUp(usernameController.text, passwordController.text);
+          //print('Login Button Pressed'),
+        }, 
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),

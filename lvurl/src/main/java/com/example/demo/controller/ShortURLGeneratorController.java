@@ -65,9 +65,9 @@ public class ShortURLGeneratorController {
 	}
 	
 	@RequestMapping("/create/User")
-	public String userCreation(@RequestParam String userName, @RequestParam String password)
+	public String userCreation(@RequestBody AuthenticationRequest authenticationRequest)
 	{
-		com.example.demo.model.User u = userService.createUser(userName, password);
+		com.example.demo.model.User u = userService.createUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 		return u.toString();
 		
 	}

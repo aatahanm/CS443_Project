@@ -3,6 +3,9 @@ import 'package:URLShortener/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:URLShortener/utilities/constants.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -10,7 +13,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+    bool _isLoading = false;
   // bool _rememberMe = false;
+
+  TextEditingController usernameController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
 
   Widget _buildEmailTF() {
     return Column(
@@ -26,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: usernameController,
             keyboardType: TextInputType.text,
             style: TextStyle(
               color: Colors.white,
@@ -61,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: passwordController,
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -109,13 +118,46 @@ class _LoginScreenState extends State<LoginScreen> {
   //   );
   // }
 
+  signIn(String username, String password) async{
+    Map data = {
+      'username': username,
+      'password': password
+    };
+    var jsonData = null;
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
+    var response = await http.post("http://192.168.1.107:31703/authenticate",
+     body: json.encode(data),
+     headers: { 
+       'Content-type': "application/json"});
+    if(response.statusCode == 200){
+      jsonData = json.decode(response.body);
+      setState(() {
+        _isLoading = false;
+        //sharedPreferences.setString("token", jsonData("token"));
+        Navigator.of(context).pushReplacementNamed('/home');
+        print(jsonData.toString());
+      });
+   
+    }else {
+      _isLoading = false;
+      print(response.body);
+    }
+  }
+
+
   Widget _buildLoginBtn() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5.0,
-        onPressed: () => Navigator.of(context).pushReplacementNamed('/home'),//print('Login Button Pressed'),
+        onPressed: () {
+          setState(() {
+            _isLoading = true;
+          });
+          signIn(usernameController.text, passwordController.text);
+          //print('Login Button Pressed'),
+        },
         padding: EdgeInsets.all(15.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
@@ -171,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Stack(
+          child: _isLoading ? Center(child: CircularProgressIndicator()) : Stack(
             children: <Widget>[
               Container(
                 height: double.infinity,
