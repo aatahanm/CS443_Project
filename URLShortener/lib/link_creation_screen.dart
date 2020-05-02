@@ -1,5 +1,9 @@
 import 'package:URLShortener/app_theme.dart';
+import 'package:URLShortener/utilities/config.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LinkCreationScreen extends StatefulWidget {
   @override
@@ -7,6 +11,9 @@ class LinkCreationScreen extends StatefulWidget {
 }
 
 class _LinkCreationScreenState extends State<LinkCreationScreen> {
+  bool _isLoading = false;
+  TextEditingController longURLController = new TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +62,7 @@ class _LinkCreationScreenState extends State<LinkCreationScreen> {
                   _buildComposer(),
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: Center(
+                    child: _isLoading ? Center(child: CircularProgressIndicator()) : Center(
                       child: Container(
                         width: 190,
                         height: 50,
@@ -74,7 +81,10 @@ class _LinkCreationScreenState extends State<LinkCreationScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
-                              Navigator.of(context).pushReplacementNamed('/home');
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              sendLinkCreationRequest(longURLController.text);
                             },
                             child: Center(
                               child: Padding(
@@ -102,6 +112,31 @@ class _LinkCreationScreenState extends State<LinkCreationScreen> {
     );
   }
 
+  sendLinkCreationRequest(String longURL) async{
+
+    var jsonData = null;
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
+    var response = await http.post(serverURL + "/create/URL?userName=" + sharedPreferences.getString("username") 
+    + "&longURL=" + longURL,
+     headers: { 
+       'Content-type': "application/json",
+       'Authorization': sharedPreferences.getString("token")});
+    if(response.statusCode == 200){
+      setState(() {
+        _isLoading = false;
+        Navigator.of(context).pushReplacementNamed('/home');
+      });
+   
+    }else {
+      setState(() {
+        _isLoading = false;
+      });
+      print(response.body);
+      print(sharedPreferences.getString("username"));
+      print(sharedPreferences.getString("token"));
+    }
+  }
+
   Widget _buildComposer() {
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 32, right: 32),
@@ -126,6 +161,7 @@ class _LinkCreationScreenState extends State<LinkCreationScreen> {
               padding:
                   const EdgeInsets.only(left: 10, right: 10, top: 0, bottom: 0),
               child: TextField(
+                controller: longURLController,
                 maxLines: null,
                 onChanged: (String txt) {},
                 style: TextStyle(

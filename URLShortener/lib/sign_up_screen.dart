@@ -1,6 +1,7 @@
 
 import 'dart:io';
 
+import 'package:URLShortener/utilities/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:URLShortener/utilities/constants.dart';
@@ -159,7 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       'password': password
     };
     var jsonData = null;
-    var response = await http.post("http://192.168.1.107:31703/create/User",
+    var response = await http.post(serverURL + "/create/User",
      body: json.encode(data),
      headers: { 
        'Content-type': "application/json"});

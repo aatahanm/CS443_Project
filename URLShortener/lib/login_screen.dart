@@ -1,5 +1,6 @@
 
 import 'package:URLShortener/sign_up_screen.dart';
+import 'package:URLShortener/utilities/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:URLShortener/utilities/constants.dart';
@@ -125,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
     };
     var jsonData = null;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
-    var response = await http.post("http://192.168.1.107:31703/authenticate",
+    var response = await http.post(serverURL +"/authenticate",
      body: json.encode(data),
      headers: { 
        'Content-type': "application/json"});
@@ -133,13 +134,16 @@ class _LoginScreenState extends State<LoginScreen> {
       jsonData = json.decode(response.body);
       setState(() {
         _isLoading = false;
-        //sharedPreferences.setString("token", jsonData("token"));
+        sharedPreferences.setString("username", username);
+        sharedPreferences.setString("token", "Bearer " + jsonData['jwt']);
         Navigator.of(context).pushReplacementNamed('/home');
-        print(jsonData.toString());
+        print(sharedPreferences.getString("token"));
       });
    
     }else {
-      _isLoading = false;
+      setState(() {
+        _isLoading = false;
+      });
       print(response.body);
     }
   }
