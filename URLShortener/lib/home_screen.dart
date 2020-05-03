@@ -1,7 +1,11 @@
 import 'package:URLShortener/app_theme.dart';
 import 'package:URLShortener/link_details.screen.dart';
 import 'package:URLShortener/model/shortlinklist.dart';
+import 'package:URLShortener/utilities/config.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key key}) : super(key: key);
@@ -11,12 +15,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  bool _isLoading = true;
   List<ShortLinkList> shortLinkList = ShortLinkList.shortLinkList;
   AnimationController animationController;
   bool multiple = true;
 
+
   @override
   void initState() {
+    getAllUserLinks();
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
     super.initState();
@@ -35,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    //getAllUserLinks();
     return Scaffold(
       backgroundColor: AppTheme.white,
       body: FutureBuilder<bool>(
@@ -169,7 +177,46 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ),
     );
   }
+
+ getAllUserLinks() async{
+    var jsonData = null;
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
+    var response = await http.get(serverURL + "/getAll?userName=" + sharedPreferences.getString("username"),
+     headers: { 
+       'Content-type': "application/json",
+       'Authorization': sharedPreferences.getString("token")});
+    if(response.statusCode == 200){
+      jsonData = json.decode(response.body);
+      List<ShortLinkList> list2 = new List();
+      var count = 0;
+      try{
+      while(jsonData[count] != null){
+        ShortLinkList item = new ShortLinkList(longURL: jsonData[count]['longURL']
+        , shortURL: jsonData[count]['shortURL'], number: 0);
+        list2.add(item);
+        count++;
+      }
+      }catch (Error){
+      }
+
+      print(list2.length);
+      setState(() {
+        _isLoading = false;
+        shortLinkList = list2;
+      });
+
+    }else {
+      setState(() {
+        _isLoading = false;
+      });
+      print(response.body);
+      print(sharedPreferences.getString("username"));
+    }
 }
+
+
+}
+
 
 class ShortLinkListView extends StatelessWidget{
   const ShortLinkListView(
@@ -207,7 +254,7 @@ class ShortLinkListView extends StatelessWidget{
                       children: <Widget>[
                         Text('ShortURL:'),
                         Text(listData.shortURL),
-                        Text('Total Click: ' + listData.clickCount.toString()),
+                        Text('Total Click: ' + listData.number.toString()),
                       ]),
                     Material(
                       color: Colors.black38,

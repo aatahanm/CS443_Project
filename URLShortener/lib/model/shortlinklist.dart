@@ -1,25 +1,26 @@
 
 class ShortLinkList {
   ShortLinkList({
-    this.clickCount = 5,
+    this.userName = '',
+    this.longURL = 'NONE-ORGINAL',
     this.shortURL = 'NONE-SHORT',
-    this.originalURL = 'NONE-ORGINAL',
+    this.number = 5
   });
 
-  int clickCount;
-  String imagePath;
+  String userName;
+  int number;
   String shortURL;
-  String originalURL;
+  String longURL;
 
   static List<ShortLinkList> shortLinkList = [
     ShortLinkList(
-      clickCount: 3,
+      number: 3,
     ),
     ShortLinkList(
-      clickCount: 5,
+      number: 5,
     ),
     ShortLinkList(
-      clickCount: 7,
+      number: 7,
     ),
   ];
 }
