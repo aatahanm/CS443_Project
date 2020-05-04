@@ -50,12 +50,11 @@ public class ShortURLGeneratorController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public void redirect(@PathVariable String id, HttpServletResponse resp) throws Exception
     {
-    	
-    	final String url = shortService.getLongURL(id);
-        if (url != null)
-            resp.sendRedirect(url);
-        else
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		final String url = shortService.getLongURL(id);
+		if (url != null)
+			resp.sendRedirect("http://" + url);
+		else
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
     
 	@RequestMapping("/home")
