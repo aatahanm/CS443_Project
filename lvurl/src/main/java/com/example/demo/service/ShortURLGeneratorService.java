@@ -25,6 +25,7 @@ public class ShortURLGeneratorService {
 	{
 		User u = userRepo.findByUserName(userName);
 		u.increase();
+		userRepo.save(u);
 		int number = u.getNumber();
 		return shortRepo.save(new ShortURLGenerator(userName, longURL, number));
 	}

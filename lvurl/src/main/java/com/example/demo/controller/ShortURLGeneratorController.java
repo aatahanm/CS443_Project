@@ -87,7 +87,7 @@ public class ShortURLGeneratorController {
 		return s.toString();
 	}
 	
-	@RequestMapping("/createSpecialShortURL")
+	@RequestMapping("/create/SpecialShortURL")
 	public String createSpecial(@RequestParam String longURL, @RequestParam String shortURL)
 	{
 		ShortURLGenerator s = shortService.createCustomized();
@@ -97,7 +97,7 @@ public class ShortURLGeneratorController {
 	}
 	
 	
-	@RequestMapping(value = "/getAll", method = RequestMethod.GET)
+	@RequestMapping(value = "/get/getAllUserLinks", method = RequestMethod.GET)
 	public List<ShortURLGenerator> getAllShorts(@RequestParam String userName, HttpServletResponse resp) throws Exception
 	{
 		com.example.demo.model.User u = userService.getUser(userName);
@@ -116,7 +116,7 @@ public class ShortURLGeneratorController {
 	}
 	
 	
-	@RequestMapping(value = "/updateShortURL", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/update/updateShortURL", method = RequestMethod.PATCH)
 	public String updateShortURL(@RequestParam String shortURL, HttpServletResponse resp)
 	{
 		ShortURLGenerator s = shortService.updateShortURL(shortURL);
@@ -125,7 +125,7 @@ public class ShortURLGeneratorController {
 		return "Short URL " + shortURL + " updated as " +  s.getNumber();
 	}
 	
-	@RequestMapping(value = "/updateLongURL", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/update/LongURL", method = RequestMethod.PATCH)
 	public String updateLongURL(@RequestParam String shortURL, @RequestParam String longURL, HttpServletResponse resp)
 	{
 		if ( shortService.updateLongURL(shortURL, longURL) != null)
@@ -133,7 +133,7 @@ public class ShortURLGeneratorController {
 		return "Long URL is updated";
 	}
 	
-	@RequestMapping(value = "/updateDuration",  method = RequestMethod.PATCH)
+	@RequestMapping(value = "/update/URLDuration",  method = RequestMethod.PATCH)
 	public String updateDuration(@RequestParam String shortURL, @RequestParam long duration, HttpServletResponse resp)
 	{
 		if( shortService.updateDuration(shortURL, duration) != null)
@@ -150,7 +150,7 @@ public class ShortURLGeneratorController {
 	}
 	*/
 	
-	@RequestMapping(value = "/deleteUserURL", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/deletion/UserURL", method = RequestMethod.DELETE)
 	public String deleteUserURL(@RequestParam String userName, HttpServletResponse resp) throws Exception
 	{
 		try
@@ -165,7 +165,7 @@ public class ShortURLGeneratorController {
 		return userName +  "All short URLs are deleted!";
 	}
 	
-	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/deletion/URL", method = RequestMethod.DELETE)
 	public String delete(@RequestParam String shortURL, HttpServletResponse resp) throws Exception
 	{
 		try
@@ -181,7 +181,7 @@ public class ShortURLGeneratorController {
 		return shortURL + " is deleted";
 	}
 
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/Authenticate")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
 		try {
@@ -231,7 +231,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
 				.authorizeRequests()
-					.antMatchers("/authenticate","/create/User").permitAll()
+					.antMatchers("/", "/{id}","/create/User","/auth/Authenticate").permitAll()
 					.anyRequest().authenticated().and().
 				exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

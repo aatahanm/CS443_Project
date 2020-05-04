@@ -69,13 +69,13 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.only(top: 16),
-                    child: Text(
+                    /*child: Text(
                       'Click Count: ' + widget.shortLink.number.toString(),
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 16,
                       ),
-                    ),
+                    ),*/
                   ),
                   Container(
                     padding: const EdgeInsets.only(top: 16),

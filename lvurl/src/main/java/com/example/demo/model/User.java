@@ -69,7 +69,7 @@ public class User {
 	
 	public void increase()
 	{
-		number++;
+		this.number = this.number+1;
 	}
 
 }
