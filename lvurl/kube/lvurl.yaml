@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: lvurl
-          image: springio/lvurl:latest
+          image: gcr.io/nifty-acolyte-276213/lvurl:latest
           ports:
             - containerPort: 8080
           env:
@@ -45,8 +45,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: lvurl
-  minReplicas: 5
-  maxReplicas: 20
+  minReplicas: 1
+  maxReplicas: 3
   metrics:
   - type: Resource
     resource:

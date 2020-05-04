@@ -58,10 +58,10 @@ public class ShortURLGeneratorController {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
     
-	@RequestMapping("/")
+	@RequestMapping("/home")
 	public String homePage()
 	{
-		return "Welcome, It works!";
+		return "Welcome, Yusuf, Ahmet, Doga: It works!";
 	}
 	
 	@RequestMapping("/create/User")
