@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
     };
     var jsonData = null;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
-    var response = await http.post(serverURL +"/authenticate",
+    var response = await http.post(serverURL +"/auth/Authenticate",
      body: json.encode(data),
      headers: { 
        'Content-type': "application/json"});

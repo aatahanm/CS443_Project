@@ -1,5 +1,6 @@
 import 'package:URLShortener/app_theme.dart';
 import 'package:URLShortener/model/shortlinklist.dart';
+import 'package:URLShortener/utilities/config.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
@@ -59,8 +60,19 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                   Container(
                     padding: const EdgeInsets.only(top: 40),
                     child: Text(
-                      'Your Link: ' + widget.shortLink.shortURL,
-                      textAlign: TextAlign.left,
+                      'Your Link\n ' + serverURL + "/" + widget.shortLink.shortURL,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(top: 40),
+                    child: Text(
+                      'Original Link\n ' + widget.shortLink.longURL,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -69,18 +81,18 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.only(top: 16),
-                    /*child: Text(
-                      'Click Count: ' + widget.shortLink.number.toString(),
+                    child: Text(
+                      'Clicks: ' + widget.shortLink.number.toString(),
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 16,
                       ),
-                    ),*/
+                    ),
                   ),
                   Container(
-                    padding: const EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.only(top: 16, left: 16),
                     child: const Text(
-                      'You can customize your URL.',
+                      'You can customize your URL. By changing your short URL',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 16,
@@ -88,6 +100,17 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                     ),
                   ),
                   _buildComposer(),
+                  Container(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: const Text(
+                      'or by changing your original URL',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  _buildComposerLong(),
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: Center(
@@ -117,6 +140,47 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                                 padding: const EdgeInsets.all(4.0),
                                 child: Text(
                                   'Edit URL',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Center(
+                      child: Container(
+                        width: 190,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(4.0)),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.6),
+                                offset: const Offset(4, 4),
+                                blurRadius: 8.0),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/home');
+                            },
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Text(
+                                  'Delete URL',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
@@ -171,7 +235,7 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                 ),
                 cursorColor: Colors.blue,
                 decoration: InputDecoration(
-                    border: InputBorder.none, hintText: 'customize'),
+                    border: InputBorder.none, hintText: 'Change you short URL'),
               ),
             ),
           ),
@@ -179,6 +243,48 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
       ),
     );
   }
+}
+
+  Widget _buildComposerLong() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, left: 32, right: 32),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+                color: Colors.grey.withOpacity(0.8),
+                offset: const Offset(4, 4),
+                blurRadius: 8),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: Container(
+            padding: const EdgeInsets.all(4.0),
+            constraints: const BoxConstraints(minHeight: 80, maxHeight: 160),
+            color: AppTheme.white,
+            child: SingleChildScrollView(
+              padding:
+                  const EdgeInsets.only(left: 10, right: 10, top: 0, bottom: 0),
+              child: TextField(
+                maxLines: null,
+                onChanged: (String txt) {},
+                style: TextStyle(
+                  fontFamily: AppTheme.fontName,
+                  fontSize: 16,
+                  color: AppTheme.dark_grey,
+                ),
+                cursorColor: Colors.blue,
+                decoration: InputDecoration(
+                    border: InputBorder.none, hintText: 'Change you original URL'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 }
 
 class Task {

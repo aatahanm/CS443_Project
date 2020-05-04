@@ -181,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
  getAllUserLinks() async{
     var jsonData = null;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
-    var response = await http.get(serverURL + "/getAll?userName=" + sharedPreferences.getString("username"),
+    var response = await http.get(serverURL + "/get/getAllUserLinks?userName=" + sharedPreferences.getString("username"),
      headers: { 
        'Content-type': "application/json",
        'Authorization': sharedPreferences.getString("token")});
