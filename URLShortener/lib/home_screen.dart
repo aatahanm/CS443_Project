@@ -192,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       try{
       while(jsonData[count] != null){
         ShortLinkList item = new ShortLinkList(longURL: jsonData[count]['longURL']
-        , shortURL: jsonData[count]['shortURL'], number: 0);
+        , shortURL: jsonData[count]['shortURL'], number: 0, counter: jsonData[count]['counter']);
         list2.add(item);
         count++;
       }
@@ -256,7 +256,7 @@ class ShortLinkListView extends StatelessWidget{
                         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(1)),),
                         Text('OriginalURL: ' + listData.longURL,
                         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(1)),),
-                        Text('Total Click: ' + listData.number.toString(),
+                        Text('Total Click: ' + listData.counter.toString(),
                         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(1)),),
                       ]),
                     Material(

@@ -86,7 +86,7 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                   Container(
                     padding: const EdgeInsets.only(top: 16),
                     child: Text(
-                      'Clicks: ' + widget.shortLink.number.toString(),
+                      'Clicks: ' + widget.shortLink.counter.toString(),
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 16,
