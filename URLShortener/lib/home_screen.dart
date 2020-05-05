@@ -18,7 +18,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   bool _isLoading = true;
   List<ShortLinkList> shortLinkList = ShortLinkList.shortLinkList;
   AnimationController animationController;
-  bool multiple = true;
+  bool multiple = false;
 
 
   @override
@@ -160,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 child: InkWell(
                   borderRadius:
                       BorderRadius.circular(AppBar().preferredSize.height),
-                  child: Icon(
+                  /*child: Icon(
                     multiple ? Icons.dashboard : Icons.view_agenda,
                     color: AppTheme.dark_grey,
                   ),
@@ -168,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     setState(() {
                       multiple = !multiple;
                     });
-                  },
+                  },*/
                 ),
               ),
             ),
@@ -252,14 +252,17 @@ class ShortLinkListView extends StatelessWidget{
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        Text('ShortURL:'),
-                        Text(listData.shortURL),
-                        Text('Total Click: ' + listData.number.toString()),
+                        Text('ShortURL: ' + serverURL + "/" + listData.shortURL,
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(1)),),
+                        Text('OriginalURL: ' + listData.longURL,
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(1)),),
+                        Text('Total Click: ' + listData.number.toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black.withOpacity(1)),),
                       ]),
                     Material(
-                      color: Colors.black38,
+                      color: Colors.grey.shade300.withOpacity(0.3),
                       child: InkWell(
-                        splashColor: Colors.grey.withOpacity(0.2),
+                        splashColor: Colors.grey.withOpacity(0.1),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(4.0)),
                         onTap: () {

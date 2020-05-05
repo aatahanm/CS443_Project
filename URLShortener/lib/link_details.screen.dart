@@ -3,6 +3,8 @@ import 'package:URLShortener/model/shortlinklist.dart';
 import 'package:URLShortener/utilities/config.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class LinkDetailsScreen extends StatefulWidget {
   final ShortLinkList shortLink;
@@ -13,6 +15,8 @@ class LinkDetailsScreen extends StatefulWidget {
 }
 
 class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
+  TextEditingController longURLController = new TextEditingController();
+  bool _isLoading = false;
   List<charts.Series<Task, String>> _seriesPieData;
   _generateData() {
     var piedata = [
@@ -100,7 +104,7 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                     ),
                   ),
                   _buildComposer(),
-                  Container(
+                  /*Container(
                     padding: const EdgeInsets.only(top: 16),
                     child: const Text(
                       'or by changing your original URL',
@@ -110,7 +114,7 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                       ),
                     ),
                   ),
-                  _buildComposerLong(),
+                  _buildComposerLong(),*/
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: Center(
@@ -132,10 +136,12 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
-                              Navigator.of(context)
-                                  .pushReplacementNamed('/home');
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              editLongURL(longURLController.text);
                             },
-                            child: Center(
+                            child: _isLoading ? Center(child: CircularProgressIndicator()) : Center(
                               child: Padding(
                                 padding: const EdgeInsets.all(4.0),
                                 child: Text(
@@ -173,10 +179,12 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
-                              Navigator.of(context)
-                                  .pushReplacementNamed('/home');
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              deleteURL();
                             },
-                            child: Center(
+                            child: _isLoading ? Center(child: CircularProgressIndicator()) : Center(
                               child: Padding(
                                 padding: const EdgeInsets.all(4.0),
                                 child: Text(
@@ -200,6 +208,55 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
         ),
       ),
     );
+  }
+
+  editLongURL(String longURL) async{
+
+    var jsonData = null;
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
+    var response = await http.patch(serverURL + "/update/LongURL?shortURL=" + widget.shortLink.shortURL 
+    + "&longURL=" + longURL,
+     headers: { 
+       'Content-type': "application/json",
+       'Authorization': sharedPreferences.getString("token")});
+    if(response.statusCode == 200){
+      setState(() {
+        _isLoading = false;
+        Navigator.of(context).pushReplacementNamed('/home');
+      });
+   
+    }else {
+      setState(() {
+        _isLoading = false;
+      });
+      print(response.body);
+      print(sharedPreferences.getString("username"));
+      print(sharedPreferences.getString("token"));
+    }
+  }
+
+  deleteURL() async{
+
+    var jsonData = null;
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
+    var response = await http.delete(serverURL + "/deletion/URL?shortURL=" + widget.shortLink.shortURL,
+     headers: { 
+       'Content-type': "application/json",
+       'Authorization': sharedPreferences.getString("token")});
+    if(response.statusCode == 200){
+      setState(() {
+        _isLoading = false;
+        Navigator.of(context).pushReplacementNamed('/home');
+      });
+   
+    }else {
+      setState(() {
+        _isLoading = false;
+      });
+      print(response.body);
+      print(sharedPreferences.getString("username"));
+      print(sharedPreferences.getString("token"));
+    }
   }
 
   Widget _buildComposer() {
@@ -226,6 +283,7 @@ class _LinkDetailsScreenState extends State<LinkDetailsScreen> {
               padding:
                   const EdgeInsets.only(left: 10, right: 10, top: 0, bottom: 0),
               child: TextField(
+                controller: longURLController,
                 maxLines: null,
                 onChanged: (String txt) {},
                 style: TextStyle(

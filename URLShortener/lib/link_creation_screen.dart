@@ -149,7 +149,7 @@ class _LinkCreationScreenState extends State<LinkCreationScreen> {
                               setState(() {
                                 _isLoading = true;
                               });
-                              sendCustomizedLinkCreationRequest(longURLController.text);
+                              sendCustomizedLinkCreationRequest(longURLController.text, customizedURLController.text);
                             },
                             child: Center(
                               child: Padding(
@@ -178,12 +178,12 @@ class _LinkCreationScreenState extends State<LinkCreationScreen> {
   }
 
 
-  sendCustomizedLinkCreationRequest(String longURL) async{
+  sendCustomizedLinkCreationRequest(String longURL, String customizedURL) async{
 
     var jsonData = null;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance(); 
-    var response = await http.post(serverURL + "/create/URL?userName=" + sharedPreferences.getString("username") 
-    + "&longURL=" + longURL,
+    var response = await http.post(serverURL + "/create/SpecialShortURL?userName=" + sharedPreferences.getString("username")
+    + "&longURL=" + longURL + "&shortURL=" + customizedURL,
      headers: { 
        'Content-type': "application/json",
        'Authorization': sharedPreferences.getString("token")});

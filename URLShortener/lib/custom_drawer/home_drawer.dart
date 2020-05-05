@@ -1,5 +1,6 @@
 import 'package:URLShortener/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer(
@@ -18,11 +19,17 @@ class HomeDrawer extends StatefulWidget {
 }
 
 class _HomeDrawerState extends State<HomeDrawer> {
+  SharedPreferences sharedPreferences;
   List<DrawerList> drawerList;
   @override
   void initState() {
+    setUsername();
     setdDrawerListArray();
     super.initState();
+  }
+
+  setUsername() async {
+    sharedPreferences = await SharedPreferences.getInstance();
   }
 
   void setdDrawerListArray() {
@@ -100,7 +107,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8, left: 4),
                     child: Text(
-                      'USERNAME',
+                      sharedPreferences.getString("username"),
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
