@@ -57,10 +57,10 @@ public class ShortURLGeneratorController {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
     
-	@RequestMapping("/home")
+	@RequestMapping("/")
 	public String homePage()
 	{
-		return "Welcome, Yusuf, Ahmet, Doga: It works!";
+		return "Welcome, It works v2!";
 	}
 	
 	@RequestMapping("/create/User")
@@ -73,26 +73,15 @@ public class ShortURLGeneratorController {
 	@RequestMapping("/create/URL")
 	public String createURL(@RequestParam String userName, @RequestParam String longURL, HttpServletResponse resp) throws Exception
 	{
-		ShortURLGenerator s;
-		//try
-		//{
-			s = shortService.create(userName, longURL);
-		//}
-		//catch(Exception x)
-		//{
-		//	resp.sendError(HttpServletResponse.SC_CONFLICT);
-		//	return "Insertion failed!";
-	//	}
+		ShortURLGenerator s = shortService.create(userName, longURL, false, "");
 		return s.toString();
 	}
 	
 	@RequestMapping("/create/SpecialShortURL")
-	public String createSpecial(@RequestParam String longURL, @RequestParam String shortURL)
+	public String createSpecial(@RequestParam String userName, @RequestParam String longURL, @RequestParam String shortURL)
 	{
-		ShortURLGenerator s = shortService.createCustomized();
-		s.setLongURL(longURL);
-		s.setShortURL(shortURL);
-		return s.toString();	
+		ShortURLGenerator s = shortService.create(userName, longURL, true, shortURL);
+		return s.toString() + "It is a customized URL";	
 	}
 	
 	

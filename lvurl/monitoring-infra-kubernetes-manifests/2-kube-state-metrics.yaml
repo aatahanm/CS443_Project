@@ -165,3 +165,11 @@ spec:
           - --threshold=5
           - --deployment=kube-state-metrics
 
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: k8s.io/minikube-hostpath
+parameters:
+  type: pd-ssd

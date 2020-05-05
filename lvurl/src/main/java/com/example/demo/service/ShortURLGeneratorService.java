@@ -21,19 +21,22 @@ public class ShortURLGeneratorService {
 	
 	// create a short url
 	
-	public ShortURLGenerator create(String userName, String longURL)
+	public ShortURLGenerator create(String userName, String longURL, boolean customized, String customizedURL)
 	{
 		User u = userRepo.findByUserName(userName);
-		u.increase();
-		userRepo.save(u);
-		int number = u.getNumber();
-		return shortRepo.save(new ShortURLGenerator(userName, longURL, number));
-	}
-	
-	// create customized url
-	public ShortURLGenerator createCustomized()
-	{
-		return shortRepo.save(new ShortURLGenerator());
+		if( customized)
+		{
+			if(shortRepo.findByShortURL(customizedURL) == null)
+				return shortRepo.save(new ShortURLGenerator(userName, longURL, u.getNumber(), customized, customizedURL));
+			else
+				return null;
+		}
+		else
+		{
+			u.increase();
+			userRepo.save(u);
+			return shortRepo.save(new ShortURLGenerator(userName, longURL, u.getNumber(), false, ""));
+		}
 	}
 	
 	// retrieve

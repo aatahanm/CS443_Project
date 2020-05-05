@@ -17,17 +17,21 @@ public class ShortURLGenerator {
 	private String longURL;
 	private String shortURL;
 	private int number;
+
+	public ShortURLGenerator()
+	{
+		
+	}
 	
-	public ShortURLGenerator(String userName, String longURL, int number)
+	public ShortURLGenerator(String userName, String longURL, int number, boolean customized, String customizedURL)
 	{
 		this.longURL = longURL;
 		this.userName = userName;
 		this.number = number;
-		setShortURL(number);
-	}
-	
-	public ShortURLGenerator() {
-		
+		if(!customized)
+			setShortURL(number);
+		else
+			setShortURL(customizedURL);
 	}
 
 	public String getLongURL() {
@@ -85,7 +89,7 @@ public class ShortURLGenerator {
 			while (hashtext.length() < 32) {
 				hashtext = "0" + hashtext;
 			}
-			return hashtext;
+			return hashtext.substring(0,7);
 		}
 		// For specifying wrong message digest algorithms
 		catch (NoSuchAlgorithmException e) {
@@ -106,10 +110,11 @@ public class ShortURLGenerator {
 	public String getUserName() {
 		return userName;
 	}
-
+/*
 	public static void main (String[] args){
 		int n = 12345;
 		String shorturl = generator(n);
 		System.out.println("Generated short url in MD5: " + shorturl);
 	}
+*/
 }
