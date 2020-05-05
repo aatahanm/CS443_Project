@@ -17,6 +17,7 @@ public class ShortURLGenerator {
 	private String longURL;
 	private String shortURL;
 	private int number;
+	private int counter;
 
 	public ShortURLGenerator()
 	{
@@ -32,6 +33,7 @@ public class ShortURLGenerator {
 			setShortURL(number);
 		else
 			setShortURL(customizedURL);
+		this.counter = 0;
 	}
 
 	public String getLongURL() {
@@ -61,6 +63,19 @@ public class ShortURLGenerator {
 		return number;
 	}
 	
+	public void increaseCounter()
+	{
+		this.counter++;
+	}
+	
+	public int getCounter() {
+		return counter;
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
+	}
+
 	private static String generator(int number)
 	{
 		// Map to store 62 possible characters

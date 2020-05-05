@@ -58,6 +58,8 @@ public class ShortURLGeneratorService {
 			return null;
 		}
 		
+		s.increaseCounter();
+		shortRepo.save(s);
 		return s.getLongURL();
 	}
 	
