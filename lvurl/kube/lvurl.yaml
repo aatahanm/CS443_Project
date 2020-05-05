@@ -20,6 +20,9 @@ spec:
           env:
             - name: MONGO_URL
               value: mongodb://mongo:27017/test
+          resources:
+            requests:
+              cpu: 200m
           imagePullPolicy: IfNotPresent
 ---
 apiVersion: v1
@@ -33,22 +36,5 @@ spec:
     - port: 80
       targetPort: 8080
   type: LoadBalancer
+  loadBalancerIP: "34.65.109.178"
 
----
-
-apiVersion: autoscaling/v2beta1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: lvurl
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: lvurl
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      targetAverageUtilization: 10
